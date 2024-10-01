@@ -32,10 +32,16 @@ class Url
      */
     private $createdDate;
 
+    /**
+     * @ORM\Column(name="expired_date", type="datetime_immutable")
+     */
+    private $expiredDate;
+
     public function __construct()
     {
         $date = new \DateTimeImmutable();
         $this->setCreatedDate($date);
+        $this->setExpiredDate($date->modify('+1 minutes'));
         $this->setHash($date->format('YmdHis'));
     }
 
@@ -79,4 +85,17 @@ class Url
 
         return $this;
     }
+
+    public function getExpiredDate(): ?\DateTimeImmutable
+    {
+        return $this->expiredDate;
+    }
+
+    public function setExpiredDate(\DateTimeImmutable $expiredDate): self
+    {
+        $this->expiredDate = $expiredDate;
+
+        return $this;
+    }
+
 }

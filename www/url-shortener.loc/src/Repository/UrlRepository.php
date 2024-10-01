@@ -28,4 +28,10 @@ class UrlRepository extends ServiceEntityRepository
             ->getOneOrNullResult()
         ;
     }
+    public function remove(Url $url): void
+    {
+        $em = $this->getEntityManager();
+        $em->remove($url);
+        $em->flush();
+    }
 }

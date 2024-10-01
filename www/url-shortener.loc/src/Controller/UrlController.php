@@ -22,9 +22,13 @@ class UrlController extends AbstractController
         $urlRepository = $this->getDoctrine()->getRepository(Url::class);
         $existingUrl = $urlRepository->findOneBy(['url' => $urlString]);
         if ($existingUrl) {
-            return $this->json([
-                'hash' => $existingUrl->getHash()
-            ]);
+            if ($existingUrl->getExpiredDate() > new \DateTime()) {
+                return $this->json([
+                    'hash' => $existingUrl->getHash()
+                ]);
+            } else {
+                $urlRepository->remove($existingUrl);
+            }
         }
 
         $url = new Url();
@@ -49,6 +53,11 @@ class UrlController extends AbstractController
         if (empty ($url)) {
             return $this->json([
                 'error' => 'Non-existent hash.'
+            ]);
+        }
+        if ($url->getExpiredDate() < new \DateTime()) {
+            return $this->json([
+                'error' => 'Expired hash.'
             ]);
         }
         return $this->json([
