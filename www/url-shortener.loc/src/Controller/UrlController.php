@@ -8,6 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Response;
 
 class UrlController extends AbstractController
 {
@@ -45,4 +46,21 @@ class UrlController extends AbstractController
             'url' => $url->getUrl()
         ]);
     }
+
+    /**
+     * @Route("/go-url", name="go_url")
+     */
+    public function goUrl(Request $request): Response
+    {
+        /** @var UrlRepository $urlRepository */
+        $urlRepository = $this->getDoctrine()->getRepository(Url::class);
+        $url = $urlRepository->findOneByHash($request->get('hash'));
+        if (empty ($url)) {
+            return $this->json([
+                'error' => 'Non-existent hash.'
+            ]);
+        }
+        return $this->redirect($url->getUrl());
+    }
+
 }
