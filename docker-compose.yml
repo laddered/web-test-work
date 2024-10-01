@@ -11,12 +11,16 @@ services:
             - ./logs/nginx:/var/log/nginx
         links:
             - unigine_test_php
+        networks:
+            - unigine_test_network
     unigine_test_php:
         build: ./images/php
         links:
             - unigine_test_mysql
         volumes:
             - ./www:/var/www
+        networks:
+            - unigine_test_network
     unigine_test_mysql:
         image: mariadb:latest
         ports:
@@ -32,3 +36,7 @@ services:
             MYSQL_DATABASE: url_shortener
             MYSQL_USER: user
             MYSQL_PASSWORD: user
+        networks:
+            - unigine_test_network
+networks:
+    unigine_test_network:

@@ -10,6 +10,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\HttpFoundation\Response;
 
 class SendNewUrlsDataCommand extends Command
 {
@@ -54,7 +55,15 @@ class SendNewUrlsDataCommand extends Command
             curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
             $body = curl_exec($ch);
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            curl_close($ch);
+
+            if ($body === false) {
+                return [
+                    'status' => 'error',
+                    'message' => curl_error($ch), // Получаем текст ошибки
+                    'httpCode' => $httpCode,
+                ];
+            }
+
             return [
                 'status' => 'success',
                 'body' => $body,
@@ -83,13 +92,13 @@ class SendNewUrlsDataCommand extends Command
         foreach ($newUrls as $url) {
             $urlData[] = [
                 'url' => $url->getUrl(),
-                'created_at' => $url->getCreatedDate()->format('Y-m-d H:i:s'),
+                'createdDate' => $url->getCreatedDate()->format('Y-m-d H:i:s'),
             ];
         }
 
         $response = $this->sendCurl(json_encode($urlData));
         if($response['status'] == 'success') {
-            if($response['httpCode'] == 200) {
+            if($response['httpCode'] == Response::HTTP_OK) {
                 $io->success(count($newUrls) . ' new URLs sent successfully.');
                 $currentDate = new \DateTimeImmutable();
                 foreach ($newUrls as $url) {

@@ -33,9 +33,9 @@ class UrlController extends AbstractController
 
         $url = new Url();
         $url->setUrl($urlString);
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->persist($url);
-        $entityManager->flush();
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($url);
+        $em->flush();
 
         return $this->json([
             'hash' => $url->getHash()
