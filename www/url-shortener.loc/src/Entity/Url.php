@@ -37,6 +37,11 @@ class Url
      */
     private $expiredDate;
 
+    /**
+     * @ORM\Column(name="sent_date", type="datetime_immutable", nullable=true)
+     */
+    private $sentDate;
+
     public function __construct()
     {
         $date = new \DateTimeImmutable();
@@ -94,6 +99,18 @@ class Url
     public function setExpiredDate(\DateTimeImmutable $expiredDate): self
     {
         $this->expiredDate = $expiredDate;
+
+        return $this;
+    }
+
+    public function getSentDate(): ?\DateTimeImmutable
+    {
+        return $this->sentDate;
+    }
+
+    public function setSentDate(\DateTimeImmutable $sentDate): self
+    {
+        $this->sentDate = $sentDate;
 
         return $this;
     }
