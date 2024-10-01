@@ -12,12 +12,32 @@ use Symfony\Component\HttpFoundation\Response;
 
 class UrlController extends AbstractController
 {
+    private function isValidUrl(string $url): bool
+    {
+        // Регулярное выражение для проверки URL с протоколом http или https
+        return preg_match('/^https?:\/\/[a-zA-Z0-9-._~:\/?#[\]@!$&\'()*+,;=.]+$/', $url) === 1;
+    }
+
+    private function isValidHash(string $hash): bool
+    {
+        // Проверка, что хеш состоит только из букв, цифр и некоторых специальных символов (например, "-", "_", ".")
+        return preg_match('/^[a-zA-Z0-9-_\.]+$/', $hash) === 1;
+    }
+
     /**
      * @Route("/encode-url", name="encode_url")
      */
     public function encodeUrl(Request $request): JsonResponse
     {
         $urlString = $request->get('url');
+
+        if (empty($urlString) || !$this->isValidUrl($urlString)) {
+            return $this->json([
+                'status' => 'error',
+                'message' => 'Invalid URL format. URL should not contain extra characters and must contain a protocol (http:// or https://).'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
         /** @var UrlRepository $urlRepository */
         $urlRepository = $this->getDoctrine()->getRepository(Url::class);
         $existingUrl = $urlRepository->findOneBy(['url' => $urlString]);
@@ -47,17 +67,28 @@ class UrlController extends AbstractController
      */
     public function decodeUrl(Request $request): JsonResponse
     {
+        $hash = $request->get('hash');
+
+        if (empty($hash) || !$this->isValidHash($hash)) {
+            return $this->json([
+                'status' => 'error',
+                'message' => 'Invalid hash format.'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
         /** @var UrlRepository $urlRepository */
         $urlRepository = $this->getDoctrine()->getRepository(Url::class);
-        $url = $urlRepository->findOneByHash($request->get('hash'));
+        $url = $urlRepository->findOneByHash($hash);
         if (empty ($url)) {
             return $this->json([
-                'error' => 'Non-existent hash.'
+                'status' => 'error',
+                'message' => 'Non-existent hash.'
             ]);
         }
         if ($url->getExpiredDate() < new \DateTime()) {
             return $this->json([
-                'error' => 'Expired hash.'
+                'status' => 'error',
+                'message' => 'Expired hash.'
             ]);
         }
         return $this->json([
@@ -70,9 +101,18 @@ class UrlController extends AbstractController
      */
     public function goUrl(Request $request): Response
     {
+        $hash = $request->get('hash');
+
+        if (empty($hash) || !$this->isValidHash($hash)) {
+            return $this->json([
+                'status' => 'error',
+                'message' => 'Invalid hash format.'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
         /** @var UrlRepository $urlRepository */
         $urlRepository = $this->getDoctrine()->getRepository(Url::class);
-        $url = $urlRepository->findOneByHash($request->get('hash'));
+        $url = $urlRepository->findOneByHash($hash);
         if (empty ($url)) {
             return $this->json([
                 'error' => 'Non-existent hash.'
