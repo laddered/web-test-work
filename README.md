@@ -16,8 +16,7 @@ This is a test work from Web Department of Unigine Company.
 * To encode ```someurl``` you can use ```/encode-url?url=someurl``` endpoint
 * To decode ```somehash``` you can use ```/decode-url?hash=somehash``` endpoint
 * To redirect ```somehash``` you can use ```/go-url?hash=somehash``` endpoint
-
-
-* To send new urls data you can use ```php bin/console app:send-new-urls-data``` symfony command
-* To get statistics for a url between two dates in format ```Y-m-d_H:i:s``` you can use ```/urls/statistics/range?start_date=Y-m-d_H:i:s&end_date=Y-m-d_H:i:s``` endpoint
+* To get statistics for an url between two dates in format ```Y-m-d_H:i:s``` you can use ```/urls/statistics/range?start_date=Y-m-d_H:i:s&end_date=Y-m-d_H:i:s``` endpoint
 * To get statistics on a specific domain url ```example.com``` you can use ```/urls/statistics/domain?domain=example.com``` endpoint
+* To send new urls data you can use ```docker-compose exec unigine_test_php /bin/sh -c "cd url-shortener.loc && php bin/console app:send-new-urls-data"``` command
+* To do a phpunit test ```docker-compose exec unigine_test_php /bin/sh -c "cd url-shortener.loc && php bin/phpunit"``` command

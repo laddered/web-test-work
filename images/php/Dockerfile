@@ -1,5 +1,6 @@
 FROM php:7.4-fpm
 
+
 RUN apt-get update && apt-get install -y \
         mc \
         curl \
@@ -11,6 +12,7 @@ RUN apt-get update && apt-get install -y \
         libonig-dev \
         libzip-dev \
         libmcrypt-dev \
+        bash \
         && pecl install mcrypt-1.0.3 \
         && docker-php-ext-enable mcrypt \
         && docker-php-ext-install -j$(nproc) iconv mbstring mysqli pdo_mysql zip \
