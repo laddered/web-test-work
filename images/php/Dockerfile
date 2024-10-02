@@ -23,4 +23,4 @@ ADD php.ini /usr/local/etc/php/conf.d/40-custom.ini
 
 WORKDIR /var/www
 
-CMD ["sh", "-c", "composer install --optimize-autoloader --working-dir=/var/www/url-shortener.loc && php-fpm"]
+CMD ["sh", "-c", "composer install --optimize-autoloader --working-dir=/var/www/url-shortener.loc && php /var/www/url-shortener.loc/bin/console doctrine:migrations:migrate --no-interaction && php-fpm"]
