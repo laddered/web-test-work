@@ -4,6 +4,7 @@ namespace App\Tests\Controller;
 
 use App\Entity\Url;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class UrlControllerTest extends WebTestCase
 {
@@ -62,33 +63,39 @@ class UrlControllerTest extends WebTestCase
         );
     }
 
-//    public function testDecodeUrlWithInvalidHash()
-//    {
-//        $this->client->request('GET', '/decode-url', ['hash' => 'invalidhash']);
-//        $this->assertResponseStatusCodeSame(404);
-//        $this->assertJsonStringEqualsJsonString(
-//            json_encode(['status' => 'error', 'message' => 'Non-existent hash.']),
-//            $this->client->getResponse()->getContent()
-//        );
-//    }
-//
-//    public function testDecodeUrlWithEmptyHash()
-//    {
-//        $this->client->request('GET', '/decode-url', ['hash' => '']);
-//        $this->assertResponseStatusCodeSame(404);
-//        $this->assertJsonStringEqualsJsonString(
-//            json_encode(['status' => 'error', 'message' => 'Non-existent hash.']),
-//            $this->client->getResponse()->getContent()
-//        );
-//    }
-//
-//    public function testDecodeUrlWithExpiredHash()
-//    {
-//        $this->client->request('GET', '/decode-url', ['hash' => $this->expiredHash]);
-//        $this->assertResponseStatusCodeSame(404);
-//        $this->assertJsonStringEqualsJsonString(
-//            json_encode(['status' => 'error', 'message' => 'Expired hash.']),
-//            $this->client->getResponse()->getContent()
-//        );
-//    }
+    public function testDecodeUrlWithNonExistentHash()
+    {
+        $this->client->request('GET', '/decode-url', ['hash' => 'invalidhash']);
+        $this->assertResponseStatusCodeSame(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $this->assertJsonStringEqualsJsonString(
+            json_encode([
+                'status' => 'error',
+                'message' => 'Non-existent hash.'
+            ]),
+            $this->client->getResponse()->getContent()
+        );
+    }
+
+    public function testDecodeUrlWithInvalidHash()
+    {
+        $this->client->request('GET', '/decode-url', ['hash' => '']);
+        $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+        $this->assertJsonStringEqualsJsonString(
+            json_encode([
+                'status' => 'error',
+                'message' => 'Invalid hash format.'
+            ]),
+            $this->client->getResponse()->getContent()
+        );
+    }
+
+    public function testDecodeUrlWithExpiredHash()
+    {
+        $this->client->request('GET', '/decode-url', ['hash' => $this->expiredHash]);
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+        $this->assertJsonStringEqualsJsonString(
+            json_encode(['status' => 'error', 'message' => 'Expired hash.']),
+            $this->client->getResponse()->getContent()
+        );
+    }
 }

@@ -83,13 +83,13 @@ class UrlController extends AbstractController
             return $this->json([
                 'status' => 'error',
                 'message' => 'Non-existent hash.'
-            ]);
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
         if ($url->getExpiredDate() < new \DateTime()) {
             return $this->json([
                 'status' => 'error',
                 'message' => 'Expired hash.'
-            ]);
+            ], Response::HTTP_FORBIDDEN);
         }
         return $this->json([
             'url' => $url->getUrl()
@@ -107,7 +107,7 @@ class UrlController extends AbstractController
             return $this->json([
                 'status' => 'error',
                 'message' => 'Invalid hash format.'
-            ], Response::HTTP_BAD_REQUEST);
+            ],Response::HTTP_BAD_REQUEST);
         }
 
         /** @var UrlRepository $urlRepository */
@@ -116,7 +116,7 @@ class UrlController extends AbstractController
         if (empty ($url)) {
             return $this->json([
                 'error' => 'Non-existent hash.'
-            ]);
+            ],Response::HTTP_UNPROCESSABLE_ENTITY);
         }
         return $this->redirect($url->getUrl());
     }
