@@ -22,7 +22,7 @@ services:
         networks:
             - unigine_test_network
     unigine_test_mysql:
-        image: mariadb:latest
+        build: ./images/mysql
         ports:
             - "3306:3306"
         volumes:
@@ -33,9 +33,6 @@ services:
          - ./data/url_shortener.sql:/docker-entrypoint-initdb.d/dump.sql
         environment:
             MYSQL_ROOT_PASSWORD: root
-            MYSQL_DATABASE: url_shortener
-            MYSQL_USER: user
-            MYSQL_PASSWORD: user
         networks:
             - unigine_test_network
 networks:
